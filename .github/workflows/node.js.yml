@@ -1,0 +1,39 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: ["main"]
+  # pull_request:
+  #   branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: rm -fr dist
+      #  && mkdir dist
+      - run: rm -f package-lock.json
+      - run: npm install
+      - run: npm run build
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: build auto commit
+
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     path: dist
